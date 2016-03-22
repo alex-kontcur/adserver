@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="poolingConnectionManager" class="org.apache.http.impl.conn.PoolingHttpClientConnectionManager">
+        <property name="maxTotal" value="${connections.max.total:100}"/>
+        <property name="defaultMaxPerRoute" value="${connections.max.per.route:100}"/>
+    </bean>
+
+    <bean id="httpClientBuilder" class="org.apache.http.impl.client.HttpClientBuilder">
+        <property name="connectionManager" ref="poolingConnectionManager"/>
+    </bean>
+
+    <bean id="httpClient" factory-bean="httpClientBuilder" factory-method="build"/>
+
+    <bean id="clientHttpRequestFactory" class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+        <property name="connectTimeout" value="${rest.template.connection.timeout:180000}"/>
+        <property name="readTimeout" value="${rest.template.read.timeout:180000}"/>
+        <property name="httpClient" ref="httpClient"/>
+    </bean>
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="requestFactory" ref="clientHttpRequestFactory"/>
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+                <bean class="ru.adserver.infrastructure.GsonHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

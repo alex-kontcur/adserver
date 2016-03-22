@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="fileEncoding" value="UTF-8"/>
+        <property name="locations">
+            <list>
+                <value>classpath*:/*.conf</value>
+                <value>classpath*:/*.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <import resource="classpath*:META-INF/spring/server-context.xml"/>
+    <import resource="rest.xml"/>
+
+    <bean id="adsGenerator" class="ru.adserver.infrastructure.AdsGenerator"/>
+    <bean id="restClient" class="ru.adserver.infrastructure.RestClient"/>
+
+    <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" name="restExecutor">
+        <qualifier value="adTaskExecutor"/>
+        <property name="corePoolSize" value="50"/>
+        <property name="maxPoolSize" value="150"/>
+        <property name="queueCapacity" value="1000"/>
+        <property name="rejectedExecutionHandler" ref="restRejectionHandler"/>
+    </bean>
+
+    <bean id="restRejectionHandler" class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+
+</beans>

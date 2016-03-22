@@ -1,0 +1,19 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false" monitoring="autodetect" dynamicConfig="true" name="adserver-config">
+
+    <diskStore path="java.io.tmpdir/adserver-ehcache"/>
+
+    <defaultCache
+            maxElementsInMemory="100"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <!--cache for 512Mb and 1 day for live-->
+    <cache name="fs-cache" maxElementsInMemory="500000" timeToLiveSeconds="86400" overflowToDisk="false" statistics="true"/>
+
+</ehcache>

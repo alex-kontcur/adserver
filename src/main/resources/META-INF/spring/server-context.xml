@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="fileEncoding" value="UTF-8"/>
+        <property name="locations">
+            <list>
+                <value>classpath*:/*.conf</value>
+                <value>classpath*:/*.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <context:component-scan base-package="ru.adserver.service"/>
+
+    <util:map id="initialProperties" key-type="java.lang.String" value-type="java.lang.String">
+        <entry key="ads.path" value="${ads.path}"/>
+    </util:map>
+
+    <bean id="runtimeConfig" class="ru.adserver.infrastructure.RuntimeConfig">
+        <property name="properties" ref="initialProperties"/>
+    </bean>
+
+    <bean id="fsReader" class="ru.adserver.infrastructure.FsReader"/>
+
+    <import resource="classpath*:META-INF/spring/infrastructure/tcp-server.xml"/>
+    <import resource="classpath*:META-INF/spring/infrastructure/async-support.xml"/>
+    <import resource="classpath*:META-INF/spring/infrastructure/search.xml"/>
+    <import resource="classpath*:META-INF/spring/infrastructure/jpa.xml"/>
+    <import resource="classpath*:META-INF/spring/infrastructure/caches.xml"/>
+    <import resource="classpath*:META-INF/spring/infrastructure/validation.xml"/>
+    <import resource="classpath*:META-INF/spring/infrastructure/repository-jpa.xml"/>
+
+</beans>

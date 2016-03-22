@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="adServerInitializer" class="ru.adserver.tcp.AdServerInitializer"/>
+    <bean id="adServerHandler" class="ru.adserver.tcp.AdServerHandler"/>
+
+    <bean id="adBossGroup" name="adBossGroup" class="io.netty.channel.nio.NioEventLoopGroup">
+        <constructor-arg index="0" value="1"/>
+    </bean>
+
+    <bean id="adWorkerGroup" name="adWorkerGroup" class="io.netty.channel.nio.NioEventLoopGroup">
+        <constructor-arg index="0" value="10"/>
+    </bean>
+
+    <bean class="ru.adserver.tcp.AdTcpServer" lazy-init="false">
+        <property name="bossGroup" ref="adBossGroup"/>
+        <property name="workerGroup" ref="adWorkerGroup"/>
+        <property name="serverPort" value="${adserver.port}"/>
+        <property name="channelInitializer" ref="adServerInitializer"/>
+        <property name="channelOptions" ref="adChannelOptions"/>
+        <property name="childChannelOptions" ref="adChildChannelOptions"/>
+    </bean>
+
+    <util:map id="adChannelOptions" key-type="io.netty.channel.ChannelOption">
+        <entry>
+            <key>
+                <util:constant static-field="io.netty.channel.ChannelOption.SO_BACKLOG"/>
+            </key>
+            <value type="java.lang.Integer">1024</value>
+        </entry>
+    </util:map>
+
+    <util:map id="adChildChannelOptions" key-type="io.netty.channel.ChannelOption">
+        <entry>
+            <key>
+                <util:constant static-field="io.netty.channel.ChannelOption.TCP_NODELAY"/>
+            </key>
+            <value type="java.lang.Boolean">true</value>
+        </entry>
+        <entry>
+            <key>
+                <util:constant static-field="io.netty.channel.ChannelOption.SO_KEEPALIVE"/>
+            </key>
+            <value type="java.lang.Boolean">true</value>
+        </entry>
+        <entry>
+            <key>
+                <util:constant static-field="io.netty.channel.ChannelOption.SO_REUSEADDR"/>
+            </key>
+            <value type="java.lang.Boolean">true</value>
+        </entry>
+        <entry>
+            <key>
+                <util:constant static-field="io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS"/>
+            </key>
+            <value type="java.lang.Integer">1000</value>
+        </entry>
+    </util:map>
+
+    <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" name="adExecutor">
+        <qualifier value="adTaskExecutor"/>
+        <property name="corePoolSize" value="25"/>
+        <property name="maxPoolSize" value="150"/>
+        <property name="queueCapacity" value="1000"/>
+        <property name="rejectedExecutionHandler" ref="adRejectionHandler"/>
+    </bean>
+
+    <bean id="adRejectionHandler" class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+
+</beans>

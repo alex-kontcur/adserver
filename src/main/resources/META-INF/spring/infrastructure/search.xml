@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <util:constant id="LUCENE_VERSION" static-field="org.apache.lucene.util.Version.LUCENE_40"/>
+
+    <bean id="luceneAnalyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer">
+        <constructor-arg ref="LUCENE_VERSION"/>
+    </bean>
+
+    <bean id="luceneDirectory" class="org.apache.lucene.store.FSDirectory" factory-method="open">
+        <constructor-arg>
+            <bean class="java.io.File">
+                <constructor-arg value="${index.path}" />
+            </bean>
+        </constructor-arg>
+        <constructor-arg>
+            <bean class="org.apache.lucene.store.NativeFSLockFactory" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="indexWriter" class="org.apache.lucene.index.IndexWriter">
+        <constructor-arg ref="luceneDirectory" />
+        <constructor-arg>
+            <bean class="org.apache.lucene.index.IndexWriterConfig">
+                <constructor-arg ref="LUCENE_VERSION"/>
+                <constructor-arg ref="luceneAnalyzer" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="queryParser" class="org.apache.lucene.queryparser.classic.QueryParser">
+        <constructor-arg value="content" />
+        <constructor-arg ref="luceneAnalyzer" />
+    </bean>
+
+    <bean id="segmentNotFoundHacker" class="ru.adserver.infrastructure.SegmentNotFoundHacker"/>
+
+</beans>

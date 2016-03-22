@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="persistenceUnitManager" class="org.springframework.data.jpa.support.MergingPersistenceUnitManager">
+        <property name="persistenceXmlLocations">
+            <list>
+                <value>classpath*:META-INF/persistence.xml</value>
+            </list>
+        </property>
+
+        <property name="defaultDataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitManager" ref="persistenceUnitManager"/>
+        <property name="persistenceUnitName" value="adserverdb"/>
+
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="database" value="${db.platform}"/>
+                <property name="generateDdl" value="true"/>
+            </bean>
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource">
+        <property name="driverClass" value="${db.driver}"/>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="idleConnectionTestPeriodInMinutes" value="${db.idle-connection-test-period-in-minutes:10}"/>
+        <property name="idleMaxAgeInMinutes" value="${db.idle-max-age-in-minutes:60}"/>
+        <property name="partitionCount" value="${db.partition-count:3}"/>
+        <property name="maxConnectionsPerPartition" value="${db.max-connections-per-partition:33}"/>
+        <property name="minConnectionsPerPartition" value="${db.min-connections-per-partition:10}"/>
+        <property name="acquireIncrement" value="${db.acquire-increment:10}"/>
+        <property name="connectionTestStatement" value="SELECT NOW()"/>
+        <property name="statementsCacheSize" value="${db.statements-cache-size:0}"/>
+        <property name="queryExecuteTimeLimitInMs" value="${db.query-execute-time-limit-in-ms:100}"/>
+    </bean>
+</beans>

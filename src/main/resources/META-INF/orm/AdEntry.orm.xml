@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+    <entity class="ru.adserver.domain.model.AdEntry" access="FIELD">
+        <description>Represents AdEntry detailed info</description>
+        <table name="AD_ENTRY"/>
+
+        <attributes>
+            <id name="id">
+                <column name="AD_ID"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+
+            <basic name="num">
+                <column name="NUM" nullable="false"/>
+            </basic>
+
+            <basic name="hits">
+                <column name="HITS" nullable="true"/>
+            </basic>
+
+            <basic name="created">
+                <column name="CREATED" nullable="false"/>
+            </basic>
+
+            <basic name="lastAccess">
+                <column name="LAST_ACCESS" nullable="true"/>
+            </basic>
+
+        </attributes>
+    </entity>
+
+</entity-mappings>
